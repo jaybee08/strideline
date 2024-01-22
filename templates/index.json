@@ -1,0 +1,200 @@
+{
+  "sections": {
+    "shogun-home": {
+      "type": "shogun-home",
+      "settings": {
+      }
+    },
+    "9e4f9099-0238-4b05-8550-790d942d7f95": {
+      "type": "index-section-products",
+      "disabled": true,
+      "settings": {
+        "top_offset": "normal",
+        "custom_classes": "home_collections",
+        "fullwidth": false,
+        "nopaddings": false,
+        "hideallelementsonindex": false,
+        "show_title": true,
+        "title_to_left": false,
+        "boxed_title": false,
+        "text1": "OUR COLLECTIONS",
+        "text2": "Sports 2023",
+        "text3": "",
+        "use_title_as_link": true,
+        "show_button": false,
+        "button_text": "SHOW ALL",
+        "collection": "",
+        "items_always_in_center": false,
+        "limit": "8",
+        "items": "3",
+        "default_carousel": false,
+        "boxed_buttons": false,
+        "show_oneproduct_in_mobile": false,
+        "use_adaptive_height": true,
+        "toshow": "4",
+        "step": "2",
+        "module_autoplay": false,
+        "delay_time": "7000"
+      }
+    },
+    "0158b197-c3fb-4476-a4d4-6557dc726d47": {
+      "type": "index-section-promocollections",
+      "blocks": {
+        "template--21483168989485__0158b197-c3fb-4476-a4d4-6557dc726d47-item-1": {
+          "type": "item",
+          "settings": {
+            "collection": "toronto-fc",
+            "image": "shopify:\/\/shop_images\/New_Project_9.png",
+            "custom_name": "",
+            "linklist": ""
+          }
+        },
+        "template--21483168989485__0158b197-c3fb-4476-a4d4-6557dc726d47-item-2": {
+          "type": "item",
+          "settings": {
+            "collection": "cf-montreal",
+            "image": "shopify:\/\/shop_images\/New_Project_8.png",
+            "custom_name": "",
+            "linklist": ""
+          }
+        },
+        "template--21483168989485__0158b197-c3fb-4476-a4d4-6557dc726d47-item-3": {
+          "type": "item",
+          "settings": {
+            "collection": "st-louis-city-sc",
+            "image": "shopify:\/\/shop_images\/New_Project_7.png",
+            "custom_name": "",
+            "linklist": ""
+          }
+        },
+        "6a37dc6b-48ea-43e0-891a-11acca3a3e08": {
+          "type": "item",
+          "settings": {
+            "collection": "seattle-sounders-fc",
+            "image": "shopify:\/\/shop_images\/New_Project_6.png",
+            "custom_name": "",
+            "linklist": ""
+          }
+        }
+      },
+      "block_order": [
+        "template--21483168989485__0158b197-c3fb-4476-a4d4-6557dc726d47-item-1",
+        "template--21483168989485__0158b197-c3fb-4476-a4d4-6557dc726d47-item-2",
+        "template--21483168989485__0158b197-c3fb-4476-a4d4-6557dc726d47-item-3",
+        "6a37dc6b-48ea-43e0-891a-11acca3a3e08"
+      ],
+      "disabled": true,
+      "settings": {
+        "top_offset": "normal",
+        "items": "3",
+        "showtitle": true,
+        "title": ""
+      }
+    },
+    "e42b4d61-fe11-4fce-b116-9a5f76ac641c": {
+      "type": "index-section-blog",
+      "disabled": true,
+      "settings": {
+        "top_offset": "normal",
+        "custom_classes": "",
+        "fullwidth": false,
+        "show_title": true,
+        "title_to_left": false,
+        "boxed_title": false,
+        "text1": "LATES FROM BLOG",
+        "text2": "Latest and most interesting news",
+        "text3": "",
+        "use_title_as_link": true,
+        "button_text": "SHOW ALL",
+        "blog": "strideline-promo",
+        "limit": "8",
+        "items": "4",
+        "show_tags": true,
+        "blog_show_author": true,
+        "blog_show_date": true,
+        "show_comment": true,
+        "show_description": true,
+        "truncate_excerpt": false,
+        "truncate": "15",
+        "truncate_last_symbols": "..."
+      }
+    },
+    "09a55628-b551-4ecc-ac2f-a93163afae36": {
+      "type": "index-section-subscribe",
+      "disabled": true,
+      "settings": {
+        "top_offset": "small",
+        "fullwidth": true,
+        "lgsize": 8,
+        "mdsize": 10,
+        "allinleft": false,
+        "text1": "KEEP IN TOUCH",
+        "text2": "Want to stay updated with our latest news, offers, and more? Subscribe now and never miss a thing.",
+        "subfplholder": "Enter your e-mail",
+        "subfbtext": "JOIN US",
+        "text3": "By clicking the button you agree to the <a href=\"#\">Privacy Policy<\/a> and <a href=\"#\">Terms and Conditions<\/a>",
+        "fontsizetext1": 34,
+        "lineheighttext1": 41,
+        "fontweighttext1": 500,
+        "text2offset": 10,
+        "fontsizetext2": 18,
+        "lineheighttext2": 22,
+        "fontweighttext2": 300,
+        "formoffset": 34,
+        "text3offset": 30,
+        "fontsizetext3": 14,
+        "lineheighttext3": 22,
+        "fontweighttext3": 300,
+        "fontsizetext1_mobile": 31,
+        "lineheighttext1_mobile": 38,
+        "text2offset_mobile": 10,
+        "fontsizetext2_mobile": 18,
+        "lineheighttext2_mobile": 22,
+        "formoffset_mobile": 34,
+        "text3offset_mobile": 30,
+        "fontsizetext3_mobile": 14,
+        "lineheighttext3_mobile": 22,
+        "colortext1": "#191919",
+        "colortext2": "#777777",
+        "colortext3": "#777777",
+        "colorlink": "#2879fe",
+        "defaultuderline": false,
+        "bg_form": "#ffffff",
+        "bg_form_bo": "#e9e7e7",
+        "bg_form_bo_s": 1,
+        "bg_form_text": "#777777",
+        "bg_forma": "#ffffff",
+        "bg_form_boa": "#2879fe",
+        "bg_form_bo_sa": 1,
+        "bg_form_texta": "#777777",
+        "bg_color": "#ff4848",
+        "cbtntext": "#ffffff",
+        "bg_color_a": "#191919",
+        "cbtntext_a": "#ffffff",
+        "btn_custom_styles": "",
+        "btn_custom_styles_hover": "",
+        "usebgcolor": false,
+        "useboxedbgcolor": false,
+        "bgco": "#ffffff",
+        "bgdepad": "80",
+        "bgdepad_2": "80",
+        "bgmopad": "80",
+        "bgmopad_2": "80",
+        "showbgimage_bg": false,
+        "imagealign_bg": "center",
+        "imagesize_bg": "cover",
+        "usemiheight": false,
+        "backgroundminheight3": "450",
+        "backgroundminheight2": "450",
+        "backgroundminheight1": "200"
+      }
+    }
+  },
+  "order": [
+    "shogun-home",
+    "9e4f9099-0238-4b05-8550-790d942d7f95",
+    "0158b197-c3fb-4476-a4d4-6557dc726d47",
+    "e42b4d61-fe11-4fce-b116-9a5f76ac641c",
+    "09a55628-b551-4ecc-ac2f-a93163afae36"
+  ]
+}

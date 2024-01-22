@@ -1,0 +1,94 @@
+{
+  "sections": {
+    "main": {
+      "type": "cart-template",
+      "settings": {
+        "ajaxcartpage": true,
+        "cart_design": "default",
+        "cart_notes_enable": true,
+        "cart_shipping_enable": true,
+        "shipping_calculator_default_country": "United States",
+        "show_related": true,
+        "related_title": "YOU MAY BE INTERESTED IN THESE PRODUCTS",
+        "show_related_2": false,
+        "related_title_2": "STATIC BLOCK WITH PRODUCTS",
+        "collection": ""
+      }
+    },
+    "ba454b93-9d96-4909-a29f-9df21108314a": {
+      "type": "footer-section-iconbanners",
+      "blocks": {
+        "template--21514043392301__ba454b93-9d96-4909-a29f-9df21108314a-item-1": {
+          "type": "item",
+          "settings": {
+            "link": "",
+            "show_icon": "icon",
+            "icon": "icon-f-48",
+            "text1": "FREE SHIPPING",
+            "text2": "Free Shipping on all orders from the US or orders of $ 99 or more.",
+            "icon_color": "#ff4848"
+          }
+        },
+        "template--21514043392301__ba454b93-9d96-4909-a29f-9df21108314a-item-2": {
+          "type": "item",
+          "settings": {
+            "link": "",
+            "show_icon": "icon",
+            "icon": "icon-f-35",
+            "text1": "SUPPORT 24\/7",
+            "text2": "Contact us 24 hours a day, 7 days a week",
+            "icon_color": "#ff4848"
+          }
+        },
+        "template--21514043392301__ba454b93-9d96-4909-a29f-9df21108314a-item-3": {
+          "type": "item",
+          "settings": {
+            "link": "",
+            "show_icon": "icon",
+            "icon": "icon-e-09",
+            "text1": "30 DAYS RETURN",
+            "text2": "Simply return it within 24 days for an exchange.",
+            "icon_color": "#ff4848"
+          }
+        }
+      },
+      "block_order": [
+        "template--21514043392301__ba454b93-9d96-4909-a29f-9df21108314a-item-1",
+        "template--21514043392301__ba454b93-9d96-4909-a29f-9df21108314a-item-2",
+        "template--21514043392301__ba454b93-9d96-4909-a29f-9df21108314a-item-3"
+      ],
+      "settings": {
+        "top_offset": "normal-onlyindex",
+        "top_offset_normal": "tt-offset-normal_base",
+        "custom_classes": "",
+        "fullwidth": false,
+        "vertical": false,
+        "items_always_in_center": false,
+        "items": "4",
+        "show_title": false,
+        "title_to_left": false,
+        "boxed_title": false,
+        "text1": "Title",
+        "text2": "Description",
+        "main_title_color": "#191919",
+        "main_desc_color": "#777777",
+        "same_iconcolor": true,
+        "icon_color": "#2879fe",
+        "title_color": "#191919",
+        "desc_color": "#777777",
+        "title_hover_color": "#2879fe",
+        "usebgcolor": false,
+        "useboxedbgcolor": false,
+        "bgco": "#ffffff",
+        "bgdepad": "80",
+        "bgdepad_2": "80",
+        "bgmopad": "80",
+        "bgmopad_2": "80"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "ba454b93-9d96-4909-a29f-9df21108314a"
+  ]
+}

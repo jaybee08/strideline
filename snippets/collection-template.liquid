@@ -1,0 +1,390 @@
+{%- assign item = settings -%}
+{%- assign item_sidebar = item.sidebar -%}
+{%- capture flip_sidebar -%}{% if item_sidebar contains "rightColumn" %} flex-sm-row-reverse{% endif %}{%- endcapture -%}
+{%- assign pagination_limit_const = settings.pagination_limit | times: 1 -%}
+<style>
+  #loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    margin-left: unset;
+  }
+
+  .loader-spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+</style>
+
+<div id="loader" style="display: none;">
+  <div class="loader-spinner"></div>
+  <span style="font-size:14px;margin-left:1rem"> updating cart...</span>
+</div>
+
+{% comment %} <div id="custom-preloader">
+  <div class="custom-loader" style="display: block;">
+    <img width="32" height="32" alt="Page Loader" class="lazyload" data-src="{{ 'ajax-loader.gif' | asset_url }}">
+  </div>
+</div> {% endcomment %}
+
+<div class="container">
+<form action="/collections/{{ collection.handle }}" method="get" class="search-form">
+  <input style="width:100%;padding:0.6rem" type="text" name="search_terms" id="search-input" class="search-input" placeholder="Search...">
+  <button style="position:absolute;padding:0.6rem" type="submit" class="search-button revicon-search-1"></button>
+</form>
+<div id="search-results-text"></div>
+<div id="products-container"></div>
+
+</div>
+<div class="container-indent">
+  <div class="container{% if item_sidebar contains "_wide" %}-fluid-custom container-fluid-custom-mobile-padding{% endif %}">
+    <div class="row{{ flip_sidebar }}">
+
+      {%- unless item_sidebar contains "_disable_" -%}{%- include "collection-page-sidebar" -%}{%- endunless -%}
+        
+      <div class="{% if item_sidebar contains "hidden_" %}col-md-12{% else %}col-md-12 col-lg-9 col-xl-9{% endif %}">
+        {%- if collection.description != '' and settings.show_collection_description -%}
+        <div class="content-indent">
+          <div class="row tt-layout-promo-box">
+            {{ collection.description }}
+          </div>
+        </div>{%- endif -%}
+        
+        <div class="content-indent container-fluid-custom-mobile-padding-02">
+
+          {%- paginate collection.products by current_pagination_limit -%}
+
+          <div class="tt-filters-options{% if item_sidebar contains "hidden_closed" %} desctop-no-sidebar{% endif %}">
+
+            {%- include "collection-page-toolbar" -%}
+
+          </div>
+
+        <div class="tt-product-listing row{% if collection.products.size == 0 %} flex-center-message{% endif %}{% if settings.products_in_one_row %} tt-col-one only-row{% endif %}" data-onerow="{{ settings.use_one_row_in_theme }}">
+        
+
+          {%- if collection.products.size > 0 -%}
+
+            {%- for product in collection.products -%}
+  
+            <div class="col-6 col-md-{% if item.products_in_column == '5' %}4{% else %}{{ item.products_in_column }}{% endif %}{% if item.products_in_column == '5' %} col-5-inrow-lg{% endif %} tt-col-item">
+              {%- include "product-grid-item" -%}
+            </div>
+      
+
+    
+            {%- endfor -%}
+
+          {%- else -%}
+          
+            <div class="tt-empty-search">
+              <span class="tt-icon icon-g-84"></span>
+              <h2 class="tt-title">{{ 'collections.general.empty' | t }}</h2>
+              <p>{{ 'collections.general.sort_result' | t }}</p>
+            </div>
+          {%- endif -%}
+
+        </div>
+        
+
+          <div class="text-center tt_product_showmore infinitybutton{% if settings.enable_infinite_scroll == 'autoscroll' %} autoscroll_yes{% endif %}{% if paginate.next == empty? and paginate.previous == empty? %} hide{% endif %}">
+            
+            {%- if paginate.next -%}
+            <div class="show-more">
+              <a href="{{ paginate.next.url }}" class="btn btn-border ttshowmorestyle{% if settings.enable_infinite_scroll == 'autoscroll' %} autoscroll hide{% endif %}">{{ 'collections.toolbar.button_show_more' | t }}</a>
+            </div>
+            {%- else -%}
+            {%- if paginate.previous and settings.showbuttonnomore -%}
+            <div class="show-more tt_item_all_js" >
+              <a href="#" class="btn btn-border01 ttshowmorestyle disable">{{ 'collections.toolbar.button_show_more_disabled' | t }}</a>
+            </div>
+            {%- endif -%}
+            {%- endif -%}
+
+          </div>
+          
+          {%- endpaginate -%}
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<script>
+
+  const handleAddToCart = async function (btn) {
+    try {
+      const itemCountSpan = document.querySelector('.tt-badge-cart');
+      const productElement = btn.closest('.product');
+      const variantId = productElement.getAttribute('data-variant-id');
+      const quantity = productElement.getAttribute('data-quantity');
+      const cartUrl = '/cart/add.json';
+
+      const payload = {
+        id: variantId,
+        quantity: quantity
+      };
+
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      // Update the UI immediately
+      btn.classList.add('added-to-cart');
+      btn.innerHTML = 'Adding to Cart...';
+      btn.disabled = true;
+
+      // Make the request to add item to cart
+      try {
+        const response = await fetch(cartUrl, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(payload),
+        });
+
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const addedItem = await response.json();
+        // console.log('Item added to cart:', addedItem);
+
+        const cartResponse = await fetch('/cart.js');
+
+        // Add console log to check cart response
+        console.log('Cart response:', cartResponse);
+
+        if (!cartResponse.ok) {
+          throw new Error(`HTTP error! Status: ${cartResponse.status}`);
+        }
+
+        const cartData = await cartResponse.json();
+        // console.log('Updated cart information:', cartData);
+
+        const itemCount = cartData.item_count;
+        // console.log('Total item_count:', itemCount);
+
+        itemCountSpan.classList.remove('hide');
+        itemCountSpan.textContent = itemCount;
+
+        btn.innerHTML = 'Added to Cart';
+
+      } catch (error) {
+        console.error('Error during fetch:', error);
+      }
+
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+
+      btn.innerHTML = 'Add to Order';
+      btn.disabled = false;
+    }
+  };
+
+  const handleButtonClick = function (event) {
+    const target = event.target;
+    if (target.classList.contains('AddToOrder')) {
+      handleAddToCart(target);
+    }
+  };
+
+  document.addEventListener('click', handleButtonClick);
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    var searchInput = document.getElementById('search-input');
+    var productsContainer = document.getElementById('products-container');
+    var resultsText = document.getElementById('search-results-text');
+
+    // Retrieve the search term from localStorage
+    var storedSearchTerm = localStorage.getItem('searchTerm');
+    if (storedSearchTerm) {
+    searchInput.value = storedSearchTerm;
+    }
+
+    var originalProducts = [];
+
+    // Fetch initial set of products
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+    if (xhr.status === 200) {
+    try {
+    originalProducts = JSON.parse(xhr.responseText).products;
+    displayProducts(originalProducts);
+    } catch (error) {
+    console.error('Error parsing JSON:', error);
+    }
+    } else {
+    console.error('Failed to fetch product data. Status:', xhr.status);
+    }
+    }
+    };
+
+    var collectionHandle = '{{ collection.handle }}';
+    xhr.open('GET', '/collections/' + collectionHandle + '/products.json', true);
+    xhr.send();
+
+    searchInput.addEventListener('input', function () {
+    handleSearch();
+    });
+
+    // Handle form submission
+    var searchForm = document.querySelector('.search-form');
+    if (searchForm) {
+    searchForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    handleSearch();
+    });
+    }
+
+    // Display products in the container
+    function displayProducts(products) {
+    productsContainer.innerHTML = '';
+
+    products.forEach(function (product) {
+    var collectionTags = product.tags.filter(function (tag) {
+    return tag.includes('Collection|');
+    });
+
+    if (collectionTags.length > 0) {
+    var productElement = document.createElement('div');
+    productElement.textContent = product.title + ' - ' + collectionTags[0];
+    // productsContainer.appendChild(productElement);
+    }
+    });
+    }
+
+    // Handle search logic
+    function handleSearch() {
+    var searchValue = searchInput.value.trim();
+
+    var capitalizedSearchValue = searchValue.charAt(0).toUpperCase() + searchValue.slice(1);
+
+    localStorage.setItem('searchTerm', searchValue);
+
+    if (searchValue) {
+    resultsText.textContent = 'Search results for "' + searchValue + '"';
+    } else {
+    resultsText.textContent = ''; 
+    }
+
+    if (!searchValue) {
+    history.pushState({}, '', window.location.pathname);
+    window.location.reload();
+    return; 
+    }
+
+    var matchingProducts = originalProducts.filter(function (product) {
+    return product.title.toLowerCase().includes(searchValue.toLowerCase());
+    });
+
+    displayProducts(matchingProducts);
+
+    var matchingTags = [];
+    if (matchingProducts.length > 0) {
+    matchingTags = matchingProducts.reduce(function (tags, product) {
+    var collectionTags = product.tags.filter(function (tag) {
+    return tag.includes('Collection|');
+    });
+    return tags.concat(collectionTags);
+    }, []);
+    }
+
+    if (capitalizedSearchValue || matchingTags.length > 0) {
+    var urlParams = '';
+    if (capitalizedSearchValue) {
+    urlParams += 'filter.p.tag=Collection%7C' + encodeURIComponent(capitalizedSearchValue);
+    }
+    if (matchingTags.length > 0) {
+    if (urlParams.length > 0) {
+    urlParams += '&';
+    }
+    urlParams += 'filter.p.tag=' + matchingTags.map(function (tag) {
+    return encodeURIComponent(tag);
+    }).join(',');
+    }
+
+    history.pushState({}, '', window.location.pathname + '?' + urlParams);
+    } else {
+    history.pushState({}, '', window.location.pathname);
+    }
+
+    window.location.reload();
+    }
+    });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var reloadButton = document.getElementById('reload_button');
+    var slideCart = document.getElementById('slide_cart');
+    var loader = document.getElementById('loader'); 
+
+
+    reloadButton.addEventListener('click', function () {
+      console.log('reloaded');
+      localStorage.setItem('pageReloaded', true);
+
+      location.reload();
+    });
+
+    if (localStorage.getItem('pageReloaded')) {
+      console.log('Page has been reloaded. Waiting to trigger event...');
+      showLoader();
+      setTimeout(function() {
+        slideCart.click();
+        console.log('slide cart loaded');
+        hideLoader()
+        
+        localStorage.removeItem('pageReloaded');
+      }, 3000); 
+    }
+  });
+
+  function showLoader() {
+      if (loader) {
+        loader.style.display = 'flex'; // Display the loader
+      }
+    }
+
+    function hideLoader() {
+      if (loader) {
+        loader.style.display = 'none'; // Hide the loader
+      }
+    }
+
+  document.addEventListener('DOMContentLoaded', function () {
+  var reloadButton = document.getElementById('reload_button');
+
+  reloadButton.addEventListener('click', function () {
+    console.log('reloaded');
+    localStorage.setItem('pageReloaded', true);
+    location.reload();
+  });
+});
+
+</script>
+
+
+</div>
