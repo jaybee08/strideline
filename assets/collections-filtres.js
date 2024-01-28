@@ -3,16 +3,63 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
 
 /* collection-filtres */
 (function(e) {
-  History.Adapter.bind(window,'statechange',function() {
-    if (e(".product-listing").length > 0 || e(".filters-row").length > 0) {
-      if(!obj.ajaxClickHandlerState) {
-        var n = location.search == "" ? "" : "?" + location.search;
-        var url = location.pathname + n;
-        obj.getCollectionContent(url);
+  var searchInput = document.getElementById('search-input');
+  var resultsText = document.getElementById('search-results-text');
+  var productsContainer = document.getElementById('products-container');
+
+  // Retrieve the search term from localStorage
+  var storedSearchTerm = localStorage.getItem('searchTerm');
+  if (storedSearchTerm) {
+      searchInput.value = storedSearchTerm;
+  }
+
+  var originalProducts = [];
+
+
+  // Your existing searchInput event listener
+  searchInput.addEventListener('input', function (event) {
+
+      if (searchInput.value.trim() === '') {
+
+        console.log('Input is zero');
+        var clearTags = document.querySelector('.clear_all');
+        obj.initShopifyFiltresEvent();
+        console.log(clearTags);
+
+        searchInput.value = '';
+
+        var currentUrl = window.location.href;
+   
+        searchInput.timeoutId = setTimeout(function () {
+          var urlWithoutParams = currentUrl.split('?')[0];
+          history.pushState({}, '', window.location.pathname);
+          clearTags.click();
+
+        }, 1000);
+
+
+      } else {
+          // Set a new timeout for handling search after a delay
+          searchInput.timeoutId = setTimeout(function () {
+              obj.handleSearch();
+          }, 1000);
       }
-      obj.ajaxClickHandlerState = false;
-    }
+
   });
+  
+ 
+  // History API statechange event listener
+  History.Adapter.bind(window, 'statechange', function() {
+      if (e(".product-listing").length > 0 || e(".filters-row").length > 0) {
+          if (!obj.ajaxClickHandlerState) {
+              var n = location.search == "" ? "" : "?" + location.search;
+              var url = location.pathname + n;
+              obj.getCollectionContent(url);
+          }
+          obj.ajaxClickHandlerState = false;
+      }
+  });
+  
 
   var queryParams = {};
   var obj = {
@@ -183,6 +230,26 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
           
         });
       };
+      if (e(".search-remove-js").length > 0) {
+        e('.search-remove-js button').unbind().click(function(event) {
+          event.preventDefault();
+          var $_this = e(this),
+              path = location.pathname,
+              hrefpath = $_this.attr('href').split('?').shift();
+          
+              delete queryParams.page;
+
+          if($_this.hasClass('clear_all')) {
+            delete queryParams.constraint;
+            obj.ajaxClick($_this.attr('href'));
+            searchInput.value = '';
+            storedSearchTerm = localStorage.setItem('');
+          }
+          else {
+
+          }
+        });
+      };
     },
     initSortbyState: function() {
       if (e(".sort-position").length > 0) {
@@ -300,7 +367,7 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
       }
       else {
         view = view[0];
-        url = view.indexOf('ajax') > -1 ?url:url.replace(view, view+'ajax');
+        url = view.indexOf('ajax') > -1 ?url:url.replace(view, view + 'ajax');
       }
 
       var params = {
@@ -318,7 +385,7 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
         },
         error: function(XMLHttpRequest, textStatus) {
           obj.hidePreloader();
-          alert("error")
+          alert("ajax error")
         }
       }
       jQuery.ajax(params);
@@ -381,6 +448,83 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
       content = null;
       data = null;
     },
+    // Handle search logic
+    handleSearch: function() {
+      var searchValue = searchInput.value.trim();
+      var capitalizedSearchValue = searchValue.charAt(0).toUpperCase() + searchValue.slice(1);
+
+      localStorage.setItem('searchTerm', searchValue);
+
+      var originalProducts = [];
+      var matchingProducts = [];
+
+      async function fetchProducts() {
+        try {
+            const response = await fetch(`/collections/${window.collectionHandle}/products.json`);
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch product data. Status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            const originalProducts = data.products;
+            
+           // console.log('orignal products', originalProducts);
+
+            var matchingProducts = originalProducts.filter(function (product) {
+              return product.title.toLowerCase().includes(searchValue.toLowerCase());
+            });
+
+            //console.log('matching:', matchingProducts);
+
+            var matchingTags = [];
+            if (matchingProducts.length > 0) {
+                matchingTags = matchingProducts.reduce(function (tags, product) {
+                    var collectionTags = product.tags.filter(function (tag) {
+                        return tag.includes('Collection|');
+                    });
+                    return tags.concat(collectionTags);
+                }, []);
+            }
+      
+            if (capitalizedSearchValue || matchingTags.length > 0) {
+              var urlParams = '';
+          
+              if (capitalizedSearchValue) {
+                  urlParams += 'filter.p.tag=Collection%7C' + encodeURIComponent(capitalizedSearchValue);
+              }
+          
+              if (matchingTags.length > 0) {
+                  if (urlParams.length > 0) {
+                      urlParams += '&';
+                  }
+                  urlParams += 'filter.p.tag=' + matchingTags.map(function (tag) {
+                      return encodeURIComponent(tag);
+                  }).join(',');
+              }
+          
+              // Append urlParams to the current search part of the URL
+              var currentUrl = window.location.href;
+              var updatedUrl = currentUrl.split('?')[0] + (urlParams.length > 0 ? '?' + urlParams : '');
+          
+              obj.ajaxClickHandlerState = true;
+              
+              // Use History.pushState to update the URL without triggering a full page reload
+              History.pushState({
+                  param: Shopify.queryParams
+              }, document.title, updatedUrl.replace('ajax', ''));
+              obj.getCollectionContent(updatedUrl);
+          }
+          
+
+          } catch (error) {
+            console.error('Error:', error.message);
+        }
+    }
+    
+    // Call the function to fetch products
+    fetchProducts();
+  },
 	//Utils
     showPreloader: function() {
       e(".custom-loader").show();

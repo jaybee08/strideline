@@ -38,17 +38,12 @@
   <span style="font-size:14px;margin-left:1rem"> updating cart...</span>
 </div>
 
-{% comment %} <div id="custom-preloader">
-  <div class="custom-loader" style="display: block;">
-    <img width="32" height="32" alt="Page Loader" class="lazyload" data-src="{{ 'ajax-loader.gif' | asset_url }}">
-  </div>
-</div> {% endcomment %}
 
 <div class="container">
-<form action="/collections/{{ collection.handle }}" method="get" class="search-form">
-  <input style="width:100%;padding:0.6rem" type="text" name="search_terms" id="search-input" class="search-input" placeholder="Search...">
-  <button style="position:absolute;padding:0.6rem" type="submit" class="search-button revicon-search-1"></button>
-</form>
+<div class="search-form search-remove-js">
+  <input style="width:100%;padding:0.6rem" type="text" name="" id="search-input" class="search-input" placeholder="Search...">
+  <button style="position:absolute;padding:0.6rem;color:#fff;background:#000;border-color:#000" type="submit" href="/collections/{{ collection.handle }}" class="clear_all">Clear all</button>
+</div>
 <div id="search-results-text"></div>
 <div id="products-container"></div>
 
@@ -212,138 +207,6 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-      var searchInput = document.getElementById('search-input');
-      var productsContainer = document.getElementById('products-container');
-      var resultsText = document.getElementById('search-results-text');
-
-      // Retrieve the search term from localStorage
-      var storedSearchTerm = localStorage.getItem('searchTerm');
-      if (storedSearchTerm) {
-          searchInput.value = storedSearchTerm;
-      }
-
-      var originalProducts = [];
-
-      // Fetch initial set of products
-      var xhr = new XMLHttpRequest();
-      xhr.onreadystatechange = function () {
-          if (xhr.readyState === 4) {
-              if (xhr.status === 200) {
-                  try {
-                      originalProducts = JSON.parse(xhr.responseText).products;
-                      displayProducts(originalProducts);
-                  } catch (error) {
-                      console.error('Error parsing JSON:', error);
-                  }
-              } else {
-                  console.error('Failed to fetch product data. Status:', xhr.status);
-              }
-          }
-      };
-
-      var collectionHandle = '{{ collection.handle }}';
-      xhr.open('GET', '/collections/' + collectionHandle + '/products.json', true);
-      xhr.send();
-
-      searchInput.addEventListener('input', function () {
-        // Clear any existing timeouts
-        clearTimeout(searchInput.timeoutId);
-    
-          searchInput.timeoutId = setTimeout(function () {
-              handleSearch();
-          }, 1000);
-      });
-    
-
-      // Handle form submission
-      var searchForm = document.querySelector('.search-form');
-      if (searchForm) {
-          searchForm.addEventListener('submit', function (event) {
-              event.preventDefault();
-              handleSearch();
-          });
-      }
-
-      // Display products in the container
-      function displayProducts(products) {
-          productsContainer.innerHTML = '';
-
-          products.forEach(function (product) {
-              var collectionTags = product.tags.filter(function (tag) {
-                  return tag.includes('Collection|');
-              });
-
-              if (collectionTags.length > 0) {
-                  var productElement = document.createElement('div');
-                  productElement.textContent = product.title + ' - ' + collectionTags[0];
-                  // productsContainer.appendChild(productElement);
-              }
-          });
-      }
-
-      // Handle search logic
-      function handleSearch() {
-          var searchValue = searchInput.value.trim();
-
-          var capitalizedSearchValue = searchValue.charAt(0).toUpperCase() + searchValue.slice(1);
-
-          localStorage.setItem('searchTerm', searchValue);
-
-          if (searchValue) {
-              resultsText.textContent = 'Search results for "' + searchValue + '"';
-          } else {
-              resultsText.textContent = '';
-          }
-
-          if (!searchValue) {
-              history.pushState({}, '', window.location.pathname);
-              window.location.reload();
-              return;
-          }
-
-          var matchingProducts = originalProducts.filter(function (product) {
-              return product.title.toLowerCase().includes(searchValue.toLowerCase());
-          });
-
-          displayProducts(matchingProducts);
-
-          var matchingTags = [];
-          if (matchingProducts.length > 0) {
-              matchingTags = matchingProducts.reduce(function (tags, product) {
-                  var collectionTags = product.tags.filter(function (tag) {
-                      return tag.includes('Collection|');
-                  });
-                  return tags.concat(collectionTags);
-              }, []);
-          }
-
-          if (capitalizedSearchValue || matchingTags.length > 0) {
-              var urlParams = '';
-              if (capitalizedSearchValue) {
-                  urlParams += 'filter.p.tag=Collection%7C' + encodeURIComponent(capitalizedSearchValue);
-              }
-              if (matchingTags.length > 0) {
-                  if (urlParams.length > 0) {
-                      urlParams += '&';
-                  }
-                  urlParams += 'filter.p.tag=' + matchingTags.map(function (tag) {
-                      return encodeURIComponent(tag);
-                  }).join(',');
-              }
-
-              history.pushState({}, '', window.location.pathname + '?' + urlParams);
-          } else {
-              history.pushState({}, '', window.location.pathname);
-          }
-
-          window.location.reload();
-      }
-  });
-</script>
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
     var reloadButton = document.getElementById('reload_button');
     var slideCart = document.getElementById('slide_cart');
     var loader = document.getElementById('loader'); 
@@ -381,17 +244,15 @@
       }
     }
 
-  document.addEventListener('DOMContentLoaded', function () {
-  var reloadButton = document.getElementById('reload_button');
+    document.addEventListener('DOMContentLoaded', function () {
+    var reloadButton = document.getElementById('reload_button');
 
-  reloadButton.addEventListener('click', function () {
-    console.log('reloaded');
-    localStorage.setItem('pageReloaded', true);
-    location.reload();
+    reloadButton.addEventListener('click', function () {
+      console.log('reloaded');
+      localStorage.setItem('pageReloaded', true);
+      location.reload();
+    });
   });
-});
 
 </script>
-
-
 </div>
