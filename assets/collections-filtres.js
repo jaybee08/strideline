@@ -14,9 +14,36 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
 
   var originalProducts = [];
 
+  function debounce(func, wait, immediate) {
+    var timeout;
+
+      return function () {
+          var context = this,
+              args = arguments;
+
+          var later = function () {
+              timeout = null;
+              if (!immediate) {
+                  func.apply(context, args);
+              }
+          };
+
+          var callNow = immediate && !timeout;
+
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+
+          if (callNow) {
+              func.apply(context, args);
+          }
+      };
+  }
+
 
   // Your existing searchInput event listener
   searchInput.addEventListener('input', function (event) {
+   
+    var debouncedHandleSearch = debounce(obj.handleSearch(), 300); // Adjust the delay as needed
 
       if (searchInput.value.trim() === '') {
 
@@ -38,7 +65,7 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
       } else {
           // Set a new timeout for handling search after a delay
           searchInput.timeoutId = setTimeout(function () {
-              obj.handleSearch();
+            debouncedHandleSearch();
           }, 1000);
       }
 
@@ -367,11 +394,34 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
         url = view.indexOf('ajax') > -1 ?url:url.replace(view, view + 'ajax');
       }
 
+      function debounce(func, wait, immediate) {
+        var timeout;
+    
+        return function () {
+            var context = this,
+                args = arguments;
+    
+            var later = function () {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+    
+            var callNow = immediate && !timeout;
+    
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+    
+            if (callNow) func.apply(context, args);
+        };
+    }
+    
+      var debouncedShowPreloader = debounce(obj.showPreloader, 100); // Adjust the delay as needed
+
       var params = {
         type: "get",
         url: url,
         beforeSend: function() {
-          obj.showPreloader();
+          debouncedShowPreloader();
         },
         success: function(data) {
           obj.hidePreloader();
