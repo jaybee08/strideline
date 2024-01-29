@@ -5,7 +5,6 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
 (function(e) {
   var searchInput = document.getElementById('search-input');
   var resultsText = document.getElementById('search-results-text');
-  var productsContainer = document.getElementById('products-container');
 
   // Retrieve the search term from localStorage
   var storedSearchTerm = localStorage.getItem('searchTerm');
@@ -24,7 +23,6 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
         console.log('Input is zero');
         var clearTags = document.querySelector('.clear_all');
         obj.initShopifyFiltresEvent();
-        console.log(clearTags);
 
         searchInput.value = '';
 
@@ -36,7 +34,6 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
           clearTags.click();
 
         }, 1000);
-
 
       } else {
           // Set a new timeout for handling search after a delay
@@ -243,7 +240,7 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
             delete queryParams.constraint;
             obj.ajaxClick($_this.attr('href'));
             searchInput.value = '';
-            storedSearchTerm = localStorage.setItem('');
+            resultsText.style.display = 'none';
           }
           else {
 
@@ -457,6 +454,13 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
 
       var originalProducts = [];
       var matchingProducts = [];
+
+      if (searchValue) {
+        resultsText.style.display = 'block';
+        resultsText.textContent = 'Search results for "' + searchValue + '"';
+        } else {
+        resultsText.textContent = ''; 
+        }
 
       async function fetchProducts() {
         try {
