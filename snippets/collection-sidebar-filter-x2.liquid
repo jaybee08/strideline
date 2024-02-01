@@ -156,7 +156,7 @@
             style="{%- if texture_style != '' -%}background-image: url('{{ texture_style }}'){%- elsif curcol != '' -%}background:{{curcol}}{%- endif -%}"
             data-tooltip="{{ filter_value.label | excape }}"
             {% endif %}>
-            {{ filter_value.label }}
+            {{ filter_value.label | replace: 'School|', ' ' }}
           </a>
 
           {%- elsif _otypebtn contains _label -%}
@@ -168,7 +168,7 @@
             {{ filter_value.label }}
           </a>
           {%- else -%}
-          <a href="{{filter_value_url}}">{{ filter_value.label }}</a>
+          <a href="{{filter_value_url}}">{{ filter_value.label | replace: 'School|', ' ' }}</a>
           {%- endif -%}
 
           {%- else -%}
@@ -346,7 +346,7 @@
   {%- if fl == 'By Tag' -%}
   <h3 class="tt-collapse-title{% if titlestouppercase %} text-uppercase{% endif %}">By School</h3>
   <div class="tt-collapse-content">
-    <ul class="{{ design | strip }} shopifyfiltres-js">{{ data_school }}</ul>
+    <ul class="{{ design | strip }} shopifyfiltres-js">{{ data_school }}ddd</ul>
   </div>
 {% endif %}
 </div>

@@ -512,70 +512,97 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
         resultsText.textContent = ''; 
         }
 
-      async function fetchProducts() {
-        try {
-            const response = await fetch(`/collections/${window.collectionHandle}/products.json`);
-            
-            if (!response.ok) {
-                throw new Error(`Failed to fetch product data. Status: ${response.status}`);
-            }
-    
-            const data = await response.json();
-            const originalProducts = data.products;
-            
-           // console.log('orignal products', originalProducts);
 
-            var matchingProducts = originalProducts.filter(function (product) {
-              return product.title.toLowerCase().includes(searchValue.toLowerCase());
-            });
-
-            //console.log('matching:', matchingProducts);
-
-            var matchingTags = [];
-            if (matchingProducts.length > 0) {
-                matchingTags = matchingProducts.reduce(function (tags, product) {
-                    var collectionTags = product.tags.filter(function (tag) {
-                        return tag.includes('Collection|');
-                    });
-                    return tags.concat(collectionTags);
-                }, []);
-            }
+        async function fetchProducts() {
+          try {
+            const url = `${window.shop_url}/search?type=product&q=${searchValue}`;
+        
+            fetch(url)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                console.log('response OK!');
+                return response.text();
+              })
+              .then(htmlString => {
+                // Parse the HTML string using DOMParser
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlString, 'text/html');
+        
+                const productListingContainer = doc.querySelector('.tt-product-listing');
+                const colItems = productListingContainer.querySelectorAll('.tt-col-item .product');
+        
+                var matchingTagsObject = {};
+                colItems.forEach((item, index) => {
+                  const productTags = item.getAttribute('data-product-tags');
+                  matchingTagsObject[index] = productTags;
+                });
+        
+               // console.log('SearchMatch:', matchingTagsObject);
+        
+                const firstMatchingTag = Object.keys(matchingTagsObject).find(key => {
+                  const tags = matchingTagsObject[key];
+                  return tags && (tags.includes('School|') || tags.includes('Team|'));
+                });
+                
       
-            if (capitalizedSearchValue || matchingTags.length > 0) {
-              var urlParams = '';
-          
-              if (capitalizedSearchValue) {
-                  urlParams += 'filter.p.tag=Collection%7C' + encodeURIComponent(capitalizedSearchValue);
-              }
-          
-              if (matchingTags.length > 0) {
-                  if (urlParams.length > 0) {
-                      urlParams += '&';
-                  }
-                  urlParams += 'filter.p.tag=' + matchingTags.map(function (tag) {
-                      return encodeURIComponent(tag);
-                  }).join(',');
-              }
-          
-              // Append urlParams to the current search part of the URL
-              var currentUrl = window.location.href;
-              var updatedUrl = currentUrl.split('?')[0] + (urlParams.length > 0 ? '?' + urlParams : '');
-          
-              obj.ajaxClickHandlerState = true;
-              
-              // Use History.pushState to update the URL without triggering a full page reload
-              History.pushState({
-                  param: Shopify.queryParams
-              }, document.title, updatedUrl.replace('ajax', ''));
-              obj.getCollectionContent(updatedUrl);
-          }
-          
+                const filteredTagsObject = firstMatchingTag !== undefined ? {
+                  [firstMatchingTag]: tagsToFilteredPortion(matchingTagsObject[firstMatchingTag], ['School|', 'Team|'])
+                } : {};
+                
+                //console.log('Filtered Tags:', filteredTagsObject);
+                
+                function tagsToFilteredPortion(tags, prefixes) {
+                  const filteredTags = tags.split(',')
+                    .filter(tag => prefixes.some(prefix => tag.trim().startsWith(prefix)))
+                    .map(tag => tag.trim());
+                
+                  return filteredTags.length > 0 ? filteredTags : [];
+                }
+                
+        
+                  if (capitalizedSearchValue || Object.keys(filteredTagsObject).length > 0) {
+                    var urlParams = '';
 
+                    if (capitalizedSearchValue) {
+                      urlParams += 'filter.p.tag=Type%7C' + encodeURIComponent(capitalizedSearchValue);
+                    }
+                  
+                    const filteredTags = Object.values(filteredTagsObject)
+                      .flat() // Flatten the array of tags
+                      .filter(tag => ['School|', 'Team|'].some(prefix => tag.trim().startsWith(prefix)))
+                      .map(tag => encodeURIComponent(tag))
+                      .join(',');
+                  
+                    if (filteredTags.length > 0) {
+                      if (urlParams.length > 0) {
+                        urlParams += '&';
+                      }
+                      urlParams += 'filter.p.tag=' + filteredTags;
+                    }
+          
+                    // Append urlParams to the current search part of the URL
+                    var currentUrl = window.location.href;
+                    var updatedUrl = currentUrl.split('?')[0] + (urlParams.length > 0 ? '?' + urlParams : '');
+          
+                    obj.ajaxClickHandlerState = true;
+          
+                    // Use History.pushState to update the URL without triggering a full page reload
+                    History.pushState({
+                      param: Shopify.queryParams
+                    }, document.title, updatedUrl.replace('ajax', ''));
+                    obj.getCollectionContent(updatedUrl);
+                }
+              })
+              .catch(error => {
+                console.error('Fetch error:', error);
+              });
           } catch (error) {
             console.error('Error:', error.message);
+          }
         }
-    }
-    
+        
     // Call the function to fetch products
     fetchProducts();
   },
