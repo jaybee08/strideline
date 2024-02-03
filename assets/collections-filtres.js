@@ -3,16 +3,87 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
 
 /* collection-filtres */
 (function(e) {
-  History.Adapter.bind(window,'statechange',function() {
-    if (e(".product-listing").length > 0 || e(".filters-row").length > 0) {
-      if(!obj.ajaxClickHandlerState) {
-        var n = location.search == "" ? "" : "?" + location.search;
-        var url = location.pathname + n;
-        obj.getCollectionContent(url);
+  var searchInput = document.getElementById('search-input');
+  var resultsText = document.getElementById('search-results-text');
+
+  // Retrieve the search term from localStorage
+  var storedSearchTerm = localStorage.getItem('searchTerm');
+  if (storedSearchTerm) {
+      searchInput.value = storedSearchTerm;
+  }
+
+  var originalProducts = [];
+
+  function debounce(func, wait, immediate) {
+    var timeout;
+
+      return function () {
+          var context = this,
+              args = arguments;
+
+          var later = function () {
+              timeout = null;
+              if (!immediate) {
+                  func.apply(context, args);
+              }
+          };
+
+          var callNow = immediate && !timeout;
+
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+
+          if (callNow) {
+              func.apply(context, args);
+          }
+      };
+  }
+
+
+  // Your existing searchInput event listener
+  searchInput.addEventListener('input', function (event) {
+   
+    var debouncedHandleSearch = debounce(obj.handleSearch(), 300); // Adjust the delay as needed
+
+      if (searchInput.value.trim() === '') {
+
+        console.log('Input is zero');
+        var clearTags = document.querySelector('.clear_all');
+        obj.initShopifyFiltresEvent();
+
+        searchInput.value = '';
+
+        var currentUrl = window.location.href;
+   
+        searchInput.timeoutId = setTimeout(function () {
+          var urlWithoutParams = currentUrl.split('?')[0];
+          history.pushState({}, '', window.location.pathname);
+          clearTags.click();
+
+        }, 1000);
+
+      } else {
+          // Set a new timeout for handling search after a delay
+          searchInput.timeoutId = setTimeout(function () {
+            debouncedHandleSearch();
+          }, 1000);
       }
-      obj.ajaxClickHandlerState = false;
-    }
+
   });
+  
+ 
+  // History API statechange event listener
+  History.Adapter.bind(window, 'statechange', function() {
+      if (e(".product-listing").length > 0 || e(".filters-row").length > 0) {
+          if (!obj.ajaxClickHandlerState) {
+              var n = location.search == "" ? "" : "?" + location.search;
+              var url = location.pathname + n;
+              obj.getCollectionContent(url);
+          }
+          obj.ajaxClickHandlerState = false;
+      }
+  });
+  
 
   var queryParams = {};
   var obj = {
@@ -183,6 +254,26 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
           
         });
       };
+      if (e(".search-remove-js").length > 0) {
+        e('.search-remove-js button').unbind().click(function(event) {
+          event.preventDefault();
+          var $_this = e(this),
+              path = location.pathname,
+              hrefpath = $_this.attr('href').split('?').shift();
+          
+              delete queryParams.page;
+
+          if($_this.hasClass('clear_all')) {
+            delete queryParams.constraint;
+            obj.ajaxClick($_this.attr('href'));
+            searchInput.value = '';
+            resultsText.style.display = 'none';
+          }
+          else {
+
+          }
+        });
+      };
     },
     initSortbyState: function() {
       if (e(".sort-position").length > 0) {
@@ -300,14 +391,37 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
       }
       else {
         view = view[0];
-        url = view.indexOf('ajax') > -1 ?url:url.replace(view, view+'ajax');
+        url = view.indexOf('ajax') > -1 ?url:url.replace(view, view + 'ajax');
       }
+
+      function debounce(func, wait, immediate) {
+        var timeout;
+    
+        return function () {
+            var context = this,
+                args = arguments;
+    
+            var later = function () {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+    
+            var callNow = immediate && !timeout;
+    
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+    
+            if (callNow) func.apply(context, args);
+        };
+    }
+    
+      var debouncedShowPreloader = debounce(obj.showPreloader, 100); // Adjust the delay as needed
 
       var params = {
         type: "get",
         url: url,
         beforeSend: function() {
-          obj.showPreloader();
+          debouncedShowPreloader();
         },
         success: function(data) {
           obj.hidePreloader();
@@ -318,7 +432,7 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
         },
         error: function(XMLHttpRequest, textStatus) {
           obj.hidePreloader();
-          alert("error")
+          alert("ajax error")
         }
       }
       jQuery.ajax(params);
@@ -381,6 +495,117 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
       content = null;
       data = null;
     },
+    // Handle search logic
+    handleSearch: function() {
+      var searchValue = searchInput.value.trim();
+      var capitalizedSearchValue = searchValue.charAt(0).toUpperCase() + searchValue.slice(1);
+
+      localStorage.setItem('searchTerm', searchValue);
+
+      var originalProducts = [];
+      var matchingProducts = [];
+
+      if (searchValue) {
+        resultsText.style.display = 'block';
+        resultsText.textContent = 'Search results for "' + searchValue + '"';
+        } else {
+        resultsText.textContent = ''; 
+        }
+
+
+        async function fetchProducts() {
+          try {
+            const url = `${window.shop_url}/search?type=product&q=${searchValue}`;
+        
+            fetch(url)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                console.log('response OK!');
+                return response.text();
+              })
+              .then(htmlString => {
+                // Parse the HTML string using DOMParser
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlString, 'text/html');
+        
+                const productListingContainer = doc.querySelector('.tt-product-listing');
+                const colItems = productListingContainer.querySelectorAll('.tt-col-item .product');
+        
+                var matchingTagsObject = {};
+                colItems.forEach((item, index) => {
+                  const productTags = item.getAttribute('data-product-tags');
+                  matchingTagsObject[index] = productTags;
+                });
+        
+               // console.log('SearchMatch:', matchingTagsObject);
+        
+                const firstMatchingTag = Object.keys(matchingTagsObject).find(key => {
+                  const tags = matchingTagsObject[key];
+                  return tags && (tags.includes('School|') || tags.includes('Team|'));
+                });
+                
+      
+                const filteredTagsObject = firstMatchingTag !== undefined ? {
+                  [firstMatchingTag]: tagsToFilteredPortion(matchingTagsObject[firstMatchingTag], ['School|', 'Team|'])
+                } : {};
+                
+                //console.log('Filtered Tags:', filteredTagsObject);
+                
+                function tagsToFilteredPortion(tags, prefixes) {
+                  const filteredTags = tags.split(',')
+                    .filter(tag => prefixes.some(prefix => tag.trim().startsWith(prefix)))
+                    .map(tag => tag.trim());
+                
+                  return filteredTags.length > 0 ? filteredTags : [];
+                }
+                
+        
+                  if (capitalizedSearchValue || Object.keys(filteredTagsObject).length > 0) {
+                    var urlParams = '';
+
+                    if (capitalizedSearchValue) {
+                      urlParams += 'filter.p.tag=Type%7C' + encodeURIComponent(capitalizedSearchValue);
+                    }
+                  
+                    const filteredTags = Object.values(filteredTagsObject)
+                      .flat() // Flatten the array of tags
+                      .filter(tag => ['School|', 'Team|'].some(prefix => tag.trim().startsWith(prefix)))
+                      .map(tag => encodeURIComponent(tag))
+                      .join(',');
+                  
+                    if (filteredTags.length > 0) {
+                      if (urlParams.length > 0) {
+                        urlParams += '&';
+                      }
+                      urlParams += 'filter.p.tag=' + filteredTags;
+                    }
+          
+                    // Append urlParams to the current search part of the URL
+                    var currentUrl = window.location.href;
+                    var updatedUrl = currentUrl.split('?')[0] + (urlParams.length > 0 ? '?' + urlParams : '');
+          
+                    obj.ajaxClickHandlerState = true;
+          
+                    // Use History.pushState to update the URL without triggering a full page reload
+                    History.pushState({
+                      param: Shopify.queryParams
+                    }, document.title, updatedUrl.replace('ajax', ''));
+                    obj.getCollectionContent(updatedUrl);
+                }
+              })
+              .catch(error => {
+                console.error('Fetch error:', error);
+              });
+          } catch (error) {
+            console.error('Error:', error.message);
+          }
+        }
+        
+    // Call the function to fetch products
+    fetchProducts();
+  },
 	//Utils
     showPreloader: function() {
       e(".custom-loader").show();

@@ -29,7 +29,7 @@
 <li class="padding-left-10">
   {%- assign tooltip_remove_str = 'general.tooltip_texts.filter_remove' | t: filter_name: filter_value.label -%}
   <a href="{{ filter_value.url_to_remove }}" class="forremoverealfiltres" data-tooltip="{{tooltip_remove_str}}" data-tposition="right" data-findtag="span">
-    <span>{{ filter_value.label | escape }}</span>
+    <span>{{ filter_value.label | replace: 'Team|', ' ' | replace: 'School|', ' ' | replace: 'Type|', ' ' | replace: 'Collection|', ' ' | replace: 'Category|', ' ' }}</span>
   </a>
 </li>
 {%- endfor -%}
