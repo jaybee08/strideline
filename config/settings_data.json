@@ -1953,6 +1953,14 @@
     },
     "content_for_index": [
 
-    ]
+    ],
+    "blocks": {
+      "6065014864672580889": {
+        "type": "shopify:\/\/apps\/slide-cart-by-amp\/blocks\/app-embed\/0a410b8d-7dc4-4f2d-b4e8-c12d34fd2255",
+        "disabled": false,
+        "settings": {
+        }
+      }
+    }
   }
 }
