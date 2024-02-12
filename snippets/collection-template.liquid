@@ -216,13 +216,14 @@
 
 
     reloadButton.addEventListener('click', function () {
-      console.log('reloaded');
-      localStorage.setItem('pageReloaded', true);
+     // console.log('reloaded');
+      //localStorage.setItem('pageReloaded', true);
 
-      location.reload();
+     // location.reload();
+
     });
 
-    if (localStorage.getItem('pageReloaded')) {
+    {% comment %} if (localStorage.getItem('pageReloaded')) {
       console.log('Page has been reloaded. Waiting to trigger event...');
       showLoader();
       setTimeout(function() {
@@ -233,7 +234,7 @@
         localStorage.removeItem('pageReloaded');
       }, 3000); 
     }
-  });
+  }); {% endcomment %}
 
   function showLoader() {
       if (loader) {

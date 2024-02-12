@@ -1,0 +1,288 @@
+<!-- HTML for the cart drawer -->
+<div class="cart-drawer-wrapper">
+  <div id="cart-drawer" class="cart-drawer">
+    <div class="cart-header">
+        <h2>Your Cart (<span class="cart-count"></span>)</h2>
+        <button class="close-btn" onclick="closeCartDrawer()">Close</button>
+    </div>
+    <div class="cart-items" id="cart-items">
+        <!-- Cart items will be dynamically populated here -->
+    </div>
+    <div class="cart-footer">
+        <p>Total: <span id="cart-total"></span></p>
+        <a href="/checkout" class="btn">Checkout</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- JavaScript to handle cart functionality -->
+<script>
+  // Function to open the cart drawer
+  function openCartDrawer() {
+      document.getElementById("cart-drawer").classList.add("open");
+      document.querySelector(".cart-drawer-wrapper").classList.add("open");
+  }
+
+  // Function to close the cart drawer
+  function closeCartDrawer() {
+      document.getElementById("cart-drawer").classList.remove("open");
+      document.querySelector(".cart-drawer-wrapper").classList.remove("open");
+  }
+
+  // Function to update the cart drawer with latest cart items and total
+function updateCartDrawer() {
+  fetch('/cart.js')
+      .then(response => response.json())
+      .then(data => {
+          const cartItems = data.items;
+          const cartTotal = data.total_price;
+          const cartItemsContainer = document.getElementById("cart-items");
+          const cartTotalElement = document.getElementById("cart-total");
+          const cartCountElement = document.querySelector(".cart-count"); // Added
+
+
+          cartItemsContainer.innerHTML = ''; // Clear existing cart items
+
+          cartCountElement.textContent = `${data.item_count}`; // Update cart count
+
+
+          // Populate cart items
+          cartItems.forEach(item => {
+              const itemElement = document.createElement("div");
+              itemElement.classList.add('cart-item');
+              itemElement.setAttribute('data-cart-item', item.variant_id);
+
+              const itemPrice = item.price;
+
+              itemElement.innerHTML = `
+                  <div class="cart-flex">
+                  <img alt="${item.title}" width="70" height="70" src="${item.image}"><p>${item.title}</p>
+                  </div>
+                  <div class="cart-flex">
+                    <div class="quantity-selector">
+                    <button class="down" aria-label="decrease" data-item-id="${item.id}">
+                      <svg width="10" viewBox="0 0 12 2" xmlns="http://www.w3.org/2000/svg"><path d="M11.25 0H.75C.3 0 0 .4 0 1s.3 1 .75 1h10.5c.45 0 .75-.4.75-1s-.3-1-.75-1z" fill="#7A7A7A" fill-rule="nonzero"></path></svg>
+                    </button>
+                      <input type="text" id="quantity-${item.id}" value="${item.quantity}">
+                      <button class="up" aria-label="increase" data-item-id="${item.id}">
+                        <svg width="10" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M11 5H7V1a1 1 0 00-2 0v4H1a1 1 0 000 2h4v4a1 1 0 002 0V7h4a1 1 0 000-2z" fill="currentColor" fill-rule="nonzero"></path></svg>
+                      </button>
+                      </div>
+                      <span class="price" data-item-id="${item.id}">$${(itemPrice / 100).toFixed(2)}</span>
+                    </div>
+              `;
+              cartItemsContainer.appendChild(itemElement);
+          });
+
+          // Update total
+          cartTotalElement.textContent = `$${(cartTotal / 100).toFixed(2)}`;
+
+       
+          openCartDrawer(); // Open the cart drawer
+      })
+      .catch(error => console.error('Error fetching cart data:', error));
+}
+
+
+  // Function to update the quantity when the up button is clicked
+  function increaseQuantity(itemId) {
+    const quantityInput = document.querySelector(`#quantity-${itemId}`);
+    const newQuantity = parseInt(quantityInput.value) + 1;
+    quantityInput.value = newQuantity; // Update the quantity in the input field
+    updateQuantity(itemId, newQuantity); // Update the quantity in the cart
+  }
+
+  // Function to update the quantity when the down button is clicked
+  function decreaseQuantity(itemId) {
+      const quantityInput = document.querySelector(`#quantity-${itemId}`);
+      let newQuantity = parseInt(quantityInput.value) - 1;
+      newQuantity = Math.max(newQuantity, 0); // Ensure quantity doesn't go below 0
+
+      if (newQuantity === 0) {
+          // If the quantity becomes 0, remove the item from the cart
+          removeItem(itemId);
+      } else {
+          quantityInput.value = newQuantity; // Update the quantity in the input field
+          updateQuantity(itemId, newQuantity); // Update the quantity in the cart
+      }
+  }
+
+  // Function to handle changes in quantity and price
+function updateQuantity(itemId, newQuantity) {
+  const cartCountElement = document.querySelector(".cart-count"); // Added
+
+  fetch('/cart/change.js', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          id: itemId,
+          quantity: newQuantity
+      })
+  })
+  .then(response => response.json())
+  .then(data => {
+    //console.log('data', data);
+       // Update cart count
+      cartCountElement.textContent = `${data.item_count}`; // Update cart count
+      const updatedItem = data.items.find(item => item.id == itemId); // Find the updated item in the cart data
+      
+      console.log('udpated:', data.items);
+      console.log('itemID:', updatedItem);
+      if (updatedItem) {
+          const updatedPrice = updatedItem.price; // Get the updated price for the item
+          const cartTotal = data.total_price;
+          const cartTotalElement = document.getElementById("cart-total");
+          const cartItemsContainer = document.getElementById("cart-items");
+          const MenuCartIcon = document.querySelector('.tt-badge-cart');
+
+
+          console.log('updatedprice', updatedPrice);
+
+          // Update the price and total in the cart drawer
+          cartTotalElement.textContent = `$${(cartTotal / 100).toFixed(2)}`;
+          const itemElement = document.querySelector(`.cart-item[data-cart-item="${itemId}"]`);
+          console.log('cart icon count:', data.item_count);
+          if (itemElement) {
+             // itemElement.querySelector(".price").textContent = `$${(updatedPrice / 100).toFixed(2)}`;
+             const quantity = parseInt(document.querySelector(`#quantity-${itemId}`).value);
+             const totalPrice = (updatedPrice * quantity) / 100; // Calculate the total price
+
+             itemElement.querySelector(`.price[data-item-id="${itemId}"]`).textContent = `$${totalPrice.toFixed(2)}`; // Update the displayed price
+
+             MenuCartIcon.textContent = data.item_count;
+          }
+          console.log('updated');
+      }
+  })
+  .catch(error => console.error('Error updating quantity:', error));
+}
+
+// Function to remove the item from the cart
+function removeItem(itemId) {
+  fetch('/cart/change.js', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          id: itemId,
+          quantity: 0 // Set quantity to 0 to remove the item
+      })
+  })
+  .then(response => response.json())
+  .then(data => {
+      // Remove the item element from the cart drawer
+      const itemElement = document.querySelector(`#cart-items .cart-item[data-item-id="${itemId}"]`);
+      if (itemElement) {
+          itemElement.remove();
+      }
+      updateCartDrawer(); // Update the cart drawer with the latest data
+  })
+  .catch(error => console.error('Error removing item:', error));
+}
+
+
+  // Event listener to open cart drawer when cart icon is clicked
+  document.getElementById("cart-icon").addEventListener("click", updateCartDrawer);
+
+  // Event delegation for handling changes in quantity
+  document.getElementById("cart-items").addEventListener("click", function(event) {
+    const targetButton = event.target.closest("button");
+    if (!targetButton) return; // Exit if clicked element is not a button
+    
+    const itemId = targetButton.dataset.itemId;
+    if (!itemId) return; // Exit if item ID is not found
+    
+    if (targetButton.classList.contains("up")) {
+        increaseQuantity(itemId);
+        console.log('up', itemId);
+    } else if (targetButton.classList.contains("down")) {
+        decreaseQuantity(itemId);
+        console.log('down', itemId);
+    }
+  });
+
+// Update the HTML for the quantity selector buttons to include data-item-id attribute
+// Example:
+// <button class="down" aria-label="decrease" data-item-id="${item.id}">
+
+</script>
+
+<!-- CSS for styling the cart drawer -->
+<style>
+
+  .cart-drawer-wrapper.open {
+    position: fixed;
+    width: 100%;
+    display: block;
+    background: rgba(0,0,0,0.5);
+    top: 0;
+    height: 100%;
+    z-index: 10;
+  }
+
+  .cart-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 440px;
+      height: 100%;
+      background-color: white;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+      z-index: 10;
+  }
+
+  .cart-drawer.open {
+      transform: translateX(0);
+  }
+
+  .cart-header {
+      padding: 20px;
+      border-bottom: 1px solid #ccc;
+  }
+
+  .cart-items {
+      padding: 20px;
+  }
+
+  .cart-items .cart-item {
+    padding: 0.5rem;
+  }
+
+  .cart-items .cart-item .cart-flex .quantity-input {
+    width: 50px;
+  }
+  
+  .cart-footer {
+      padding: 20px;
+      border-top: 1px solid #ccc;
+  }
+
+  .cart-flex {
+    display: flex;
+  }
+  
+  .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+  }
+
+  .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #333;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 10px;
+  }
+</style>
