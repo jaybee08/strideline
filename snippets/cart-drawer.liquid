@@ -22,12 +22,23 @@
   function openCartDrawer() {
       document.getElementById("cart-drawer").classList.add("open");
       document.querySelector(".cart-drawer-wrapper").classList.add("open");
+      document.body.addEventListener('click', handleOutsideClick);
   }
 
   // Function to close the cart drawer
   function closeCartDrawer() {
       document.getElementById("cart-drawer").classList.remove("open");
       document.querySelector(".cart-drawer-wrapper").classList.remove("open");
+      document.body.removeEventListener('click', handleOutsideClick);
+  }
+
+  // Function to handle clicks outside the cart drawer
+  function handleOutsideClick(event) {
+    const cartDrawer = document.getElementById("cart-drawer");
+    const cartDrawerWrapper = document.querySelector(".cart-drawer-wrapper .open");
+      if (!cartDrawer.contains(event.target) && !cartDrawerWrapper.contains(event.target)) {
+          closeCartDrawer();
+      }
   }
 
   // Function to update the cart drawer with latest cart items and total
