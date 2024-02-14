@@ -73,7 +73,10 @@
 
                 itemElement.innerHTML = `
                     <div class="cart-flex">
-                    <img alt="${item.title}" width="70" height="70" src="${item.image}"><p>${item.title}</p>
+                    <img alt="${item.title}" width="70" height="70" src="${item.image}">
+                    <a href="${item.url}">
+                      <p>${item.title}</p>
+                    </a>
                     </div>
                     <div class="cart-flex">
                       <div class="quantity-selector">
