@@ -133,6 +133,7 @@
       const productElement = btn.closest('.product');
       const variantId = productElement.getAttribute('data-variant-id');
       const quantity = productElement.getAttribute('data-quantity');
+      const MainCartWrap = document.querySelector('.main-cart-drawer');
       const cartUrl = '/cart/add.json';
 
       const payload = {
@@ -166,7 +167,8 @@
         // console.log('Item added to cart:', addedItem);
 
         const cartResponse = await fetch('/cart.js');
-
+        MainCartWrap.style.opacity = '1';
+        
         // Add console log to check cart response
         console.log('Cart response:', cartResponse);
 
@@ -208,7 +210,7 @@
 
 </script>
 
-<script>
+{% comment %} <script>
   document.addEventListener('DOMContentLoaded', function () {
     var reloadButton = document.getElementById('reload_button');
     var slideCart = document.getElementById('slide_cart');
@@ -258,5 +260,5 @@
     });
   });
 
-</script>
+</script> {% endcomment %}
 </div>

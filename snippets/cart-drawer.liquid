@@ -1,17 +1,22 @@
 <!-- HTML for the cart drawer -->
 <div class="cart-drawer-wrapper">
+
   <div id="cart-drawer" class="cart-drawer">
     <div class="cart-header">
         <h2>Your Cart (<span class="cart-count"></span>)</h2>
         <button class="close-btn" onclick="closeCartDrawer()">Close</button>
     </div>
-    <div class="cart-items" id="cart-items">
-        <!-- Cart items will be dynamically populated here -->
+
+    <div class="main-cart-drawer">
+      <div class="cart-items" id="cart-items">
+          <!-- Cart items will be dynamically populated here -->
+      </div>
+      <div class="cart-footer">
+          <p>Total: <span id="cart-total"></span></p>
+          <a href="/checkout" class="btn">Checkout</a>
+      </div>
     </div>
-    <div class="cart-footer">
-        <p>Total: <span id="cart-total"></span></p>
-        <a href="/checkout" class="btn">Checkout</a>
-    </div>
+
   </div>
 </div>
 
@@ -50,7 +55,7 @@
             const cartTotal = data.total_price;
             const cartItemsContainer = document.getElementById("cart-items");
             const cartTotalElement = document.getElementById("cart-total");
-            const cartCountElement = document.querySelector(".cart-count"); // Added
+            const cartCountElement = document.querySelector(".cart-count");
 
 
             cartItemsContainer.innerHTML = ''; // Clear existing cart items
@@ -89,7 +94,10 @@
             // Update total
             cartTotalElement.textContent = `$${(cartTotal / 100).toFixed(2)}`;
 
-        
+            if (cartItems.lenght == 0) {
+              cartItemsContainer.remove();
+            }
+            
             openCartDrawer(); // Open the cart drawer
         })
         .catch(error => console.error('Error fetching cart data:', error));
@@ -113,8 +121,8 @@
           // If the quantity becomes 0, remove the item from the cart
           removeItem(itemId);
       } else {
-          quantityInput.value = newQuantity; // Update the quantity in the input field
-          updateQuantity(itemId, newQuantity); // Update the quantity in the cart
+          quantityInput.value = newQuantity; 
+          updateQuantity(itemId, newQuantity);
       }
   }
 
@@ -202,10 +210,15 @@
         .then(response => response.json())
         .then(data => {
             cartCountElement.textContent = `${data.item_count}`; // Update the cart count
+            console.log(data)
+            const cartMain = document.querySelector(".main-cart-drawer");
+            if(data.item_count == 0) {
+              cartMain.style.opacity = '0';
+              console.log('show empty message');
+            }
         })
         .catch(error => console.error('Error updating cart count:', error));
   }
-
 
   // Event listener to open cart drawer when cart icon is clicked
   document.getElementById("cart-icon").addEventListener("click", updateCartDrawer);
@@ -255,10 +268,21 @@
       z-index: 10;
   }
 
+  .cart-drawer.is-empty .cart-items {
+    display: none;
+  }
+
+  .cart-drawer.is-empty .cart-items {
+    display: none;
+  }
+  
   .cart-drawer.open {
       transform: translateX(0);
   }
 
+  .cart-drawer .main-cart-drawer {
+    transition: opacity 0.5s ease-in-out;
+  }
   .cart-header {
       padding: 20px;
       border-bottom: 1px solid #ccc;
