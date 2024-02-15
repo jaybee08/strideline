@@ -4,7 +4,9 @@
   <div id="cart-drawer" class="cart-drawer">
     <div class="cart-header">
         <h2>Your Cart (<span class="cart-count"></span>)</h2>
-        <button class="close-btn" onclick="closeCartDrawer()">Close</button>
+        <button class="close-btn" onclick="closeCartDrawer()">
+          <svg width="10" viewBox="0 0 10 10"><path d="M9.677 8.118a1.102 1.102 0 11-1.559 1.56L5 6.558 1.882 9.677a1.102 1.102 0 11-1.56-1.559L3.442 5 .323 1.882A1.102 1.102 0 111.882.322L5 3.442 8.118.323a1.102 1.102 0 111.56 1.559L6.558 5l3.118 3.118z" fill="#A1A1A1" fill-rule="nonzero"></path></svg>
+        </button>
     </div>
 
     <div class="main-cart-drawer">
@@ -12,8 +14,17 @@
           <!-- Cart items will be dynamically populated here -->
       </div>
       <div class="cart-footer">
-          <p>Total: <span id="cart-total"></span></p>
+        <div class="flex">
+          <div class="shipping">Shipping</div>
+          <div class="shipping-cost"><span>Calculated at checkout</span></div>
+        </div>
+        <div class="flex">
+          <div class="s-total">Subtotal:</div>
+          <span id="cart-total" class="cart-total"></span>
+        </div>
+        <div class="flex">
           <a href="/checkout" class="btn">Checkout</a>
+        </div>
       </div>
     </div>
 
@@ -57,11 +68,8 @@
             const cartTotalElement = document.getElementById("cart-total");
             const cartCountElement = document.querySelector(".cart-count");
 
-
             cartItemsContainer.innerHTML = ''; // Clear existing cart items
-
             cartCountElement.textContent = `${data.item_count}`; // Update cart count
-
 
             // Populate cart items
             cartItems.forEach(item => {
@@ -72,26 +80,30 @@
                 const itemPrice = item.price;
 
                 itemElement.innerHTML = `
-                    <div class="cart-flex">
-                    <img alt="${item.title}" width="70" height="70" src="${item.image}">
-                    <a href="${item.url}">
-                      <p>${item.title}</p>
-                    </a>
-                    </div>
-                    <div class="cart-flex">
-                      <div class="quantity-selector">
-                      <button class="down" aria-label="decrease" data-item-id="${item.id}">
-                        <svg width="10" viewBox="0 0 12 2" xmlns="http://www.w3.org/2000/svg"><path d="M11.25 0H.75C.3 0 0 .4 0 1s.3 1 .75 1h10.5c.45 0 .75-.4.75-1s-.3-1-.75-1z" fill="#7A7A7A" fill-rule="nonzero"></path></svg>
+                <div class="cart-flex">
+                  <button id="item-remove" class="item-remove" data-item-id="${item.id}">
+                    <svg width="9" viewBox="0 0 10 10"><path d="M9.677 8.118a1.102 1.102 0 11-1.559 1.56L5 6.558 1.882 9.677a1.102 1.102 0 11-1.56-1.559L3.442 5 .323 1.882A1.102 1.102 0 111.882.322L5 3.442 8.118.323a1.102 1.102 0 111.56 1.559L6.558 5l3.118 3.118z" fill="#cacaca" fill-rule="nonzero"></path></svg>
+                  </button>
+                  <img alt="${item.title}" width="90" height="90" src="${item.image}">
+                  <a href="${item.url}">
+                    <p>${item.title}</p>
+                  </a>
+                </div>
+                <div class="cart-flex">
+                  <div class="quantity-selector">
+                    <button class="down" aria-label="decrease" data-item-id="${item.id}">
+                      <svg width="10" viewBox="0 0 12 2" xmlns="http://www.w3.org/2000/svg"><path d="M11.25 0H.75C.3 0 0 .4 0 1s.3 1 .75 1h10.5c.45 0 .75-.4.75-1s-.3-1-.75-1z" fill="#7A7A7A" fill-rule="nonzero"></path></svg>
+                    </button>
+                      <input type="text" id="quantity-${item.id}" value="${item.quantity}">
+                      <button class="up" aria-label="increase" data-item-id="${item.id}">
+                        <svg width="10" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M11 5H7V1a1 1 0 00-2 0v4H1a1 1 0 000 2h4v4a1 1 0 002 0V7h4a1 1 0 000-2z" fill="currentColor" fill-rule="nonzero"></path></svg>
                       </button>
-                        <input type="text" id="quantity-${item.id}" value="${item.quantity}">
-                        <button class="up" aria-label="increase" data-item-id="${item.id}">
-                          <svg width="10" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M11 5H7V1a1 1 0 00-2 0v4H1a1 1 0 000 2h4v4a1 1 0 002 0V7h4a1 1 0 000-2z" fill="currentColor" fill-rule="nonzero"></path></svg>
-                        </button>
-                        </div>
-                        <span class="price" data-item-id="${item.id}">$${(itemPrice / 100).toFixed(2)}</span>
-                      </div>
+                  </div>
+                    <span class="price" data-item-id="${item.id}">$${(itemPrice / 100).toFixed(2)}</span>
+                </div>
                 `;
                 cartItemsContainer.appendChild(itemElement);
+
             });
 
             // Update total
@@ -150,17 +162,14 @@
         cartCountElement.textContent = `${data.item_count}`; // Update cart count
         const updatedItem = data.items.find(item => item.id == itemId); // Find the updated item in the cart data
         
-        console.log('udpated:', data.items);
-        console.log('itemID:', updatedItem);
+    //    console.log('udpated:', data.items);
+    //    console.log('itemID:', updatedItem);
         if (updatedItem) {
             const updatedPrice = updatedItem.price; // Get the updated price for the item
             const cartTotal = data.total_price;
             const cartTotalElement = document.getElementById("cart-total");
             const cartItemsContainer = document.getElementById("cart-items");
             const MenuCartIcon = document.querySelector('.tt-badge-cart');
-
-
-            console.log('updatedprice', updatedPrice);
 
             // Update the price and total in the cart drawer
             cartTotalElement.textContent = `$${(cartTotal / 100).toFixed(2)}`;
@@ -175,7 +184,7 @@
 
               MenuCartIcon.textContent = data.item_count;
             }
-            console.log('updated');
+          //  console.log('updated');
         }
     })
     .catch(error => console.error('Error updating quantity:', error));
@@ -197,11 +206,18 @@
     .then(data => {
         // Remove the item element from the cart drawer
         const itemElement = document.querySelector(`#cart-items .cart-item[data-item-id="${itemId}"]`);
+        const cartFooterElement = document.querySelector(`.cart-footer`);
         if (itemElement) {
             itemElement.remove();
         }
         updateCartDrawer(); // Update the cart drawer with the latest data
         updateCartCount(); // Update the cart count
+
+        if(data.item_count <= 3) {
+          cartFooterElement.classList.add('sticky');
+        } else {
+          cartFooterElement.classList.remove('sticky');
+        }
     })
     .catch(error => console.error('Error removing item:', error));
   }
@@ -213,7 +229,6 @@
         .then(response => response.json())
         .then(data => {
             cartCountElement.textContent = `${data.item_count}`; // Update the cart count
-            console.log(data)
             const cartMain = document.querySelector(".main-cart-drawer");
             if(data.item_count == 0) {
               cartMain.style.opacity = '0';
@@ -236,11 +251,11 @@
     
     if (targetButton.classList.contains("up")) {
         increaseQuantity(itemId);
-        console.log('up', itemId);
     } else if (targetButton.classList.contains("down")) {
         decreaseQuantity(itemId);
-        console.log('down', itemId);
-    }
+    } else if (targetButton.classList.contains("item-remove")) {
+        removeItem(itemId);
+    }    
   });
 
 </script>
@@ -269,6 +284,11 @@
       transform: translateX(100%);
       transition: transform 0.3s ease-in-out;
       z-index: 10;
+      overflow-y: scroll;
+  }
+
+  .cart-drawer::-webkit-scrollbar {
+    width: 0;
   }
 
   .cart-drawer.is-empty .cart-items {
@@ -286,39 +306,168 @@
   .cart-drawer .main-cart-drawer {
     transition: opacity 0.5s ease-in-out;
   }
+
   .cart-header {
       padding: 20px;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid #eee;
+  }
+
+  .cart-header h2 {
+    padding-bottom: 0!important;
+    font-size: 24px!important;
   }
 
   .cart-items {
-      padding: 20px;
+    min-height: 650px;
+    height: 100%;
+  }
+  .cart-items .cart-item {
+    padding: 0 0 35px 0;
+    margin: 1rem 0;
+    border-bottom: 1px solid #eee;
+    position: relative;
   }
 
-  .cart-items .cart-item {
-    padding: 0.5rem;
+  .cart-items .cart-item:last-child {
+    border-bottom: none;
+  }
+
+  .cart-items .cart-item .cart-flex a {
+    padding-left: 1rem;
+    padding-right: 2.2rem;
+    font-weight: bold;
+    color: #000000;
+    font-size: 1rem;
+  }
+
+  .cart-items .cart-item .cart-flex a:hover {
+    text-decoration: underline;
   }
 
   .cart-items .cart-item .cart-flex .quantity-input {
     width: 50px;
   }
+
+  .cart-items .cart-item .cart-flex .quantity-selector {
+    display: flex;
+    justify-content: center;
+    margin-left: -18px;
+  }
+
+  .cart-items .cart-item .cart-flex .price {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #000000;
+  }
+
+  .cart-items .cart-item .cart-flex .quantity-selector input {
+    text-align: center;
+    border: 1px solid rgba(0,0,0,0.1);
+    width: 15%;
+    font-size: 14px;
+  }
+
+  .cart-items .cart-item .cart-flex .quantity-selector button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background-color: #ffffff;
+  }
   
   .cart-footer {
-      padding: 20px;
-      border-top: 1px solid #ccc;
+    background-color: #f2f2f2;
+    padding: 15px 0;
+  }
+
+  .cart-footer.sticky {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+  }
+
+  .cart-footer p {
+    text-align: center;
+  }
+
+  .cart-footer .flex{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 2rem;
+    color: #000000;
+  }
+
+  .cart-footer .s-total {
+    padding: 0;
+    font-weight: 700;
+  }
+
+  .cart-footer .cart-total {
+    font-weight: 700;
+  }
+
+  .cart-footer .btn {
+      width: 93%;
+      padding: 1.5rem;
+      height: auto;
+      display: block;
+      margin: auto;
+      text-transform: uppercase;
+      font-weight: 700;
+  }
+
+  .cart-footer .shipping-cost {
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: #abaaaa;
+    font-weight: 600;
+    letter-spacing: 0.4;
   }
 
   .cart-flex {
     display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
+  .cart-flex .item-remove {
+    position: absolute;
+    top: -9px;
+    right: 16px;
+    border: none;
+    background: #fff;
+    transition: all 0.5s linear;
+  }
+
+  .cart-flex .item-remove svg path {
+    transition: all 0.5s linear;
+  }
+
+  .cart-flex .item-remove:hover svg path {
+    fill: unset;
+  }
+  .cart-flex .item-remove:hover svg {
+    width: 11px;
   }
   
   .close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: none;
-      border: none;
-      cursor: pointer;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    background: #eee;
+    padding: 5px 10px;
+    border-radius: 50%;
+  }
+
+  .close-btn:hover svg path {
+    fill: unset;
   }
 
   .btn {
@@ -329,5 +478,6 @@
       text-decoration: none;
       border-radius: 5px;
       margin-top: 10px;
+      background-color: rgb(255, 72, 72);
   }
 </style>

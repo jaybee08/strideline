@@ -134,6 +134,8 @@
       const variantId = productElement.getAttribute('data-variant-id');
       const quantity = productElement.getAttribute('data-quantity');
       const MainCartWrap = document.querySelector('.main-cart-drawer');
+      const cartFooterElement = document.querySelector(`.cart-footer`);
+      const cartItem = document.querySelector(`.cart-item`);
       const cartUrl = '/cart/add.json';
 
       const payload = {
@@ -170,7 +172,7 @@
         MainCartWrap.style.opacity = '1';
         
         // Add console log to check cart response
-        console.log('Cart response:', cartResponse);
+        // console.log('Cart response:', cartResponse);
 
         if (!cartResponse.ok) {
           throw new Error(`HTTP error! Status: ${cartResponse.status}`);
@@ -180,12 +182,17 @@
         // console.log('Updated cart information:', cartData);
 
         const itemCount = cartData.item_count;
-        // console.log('Total item_count:', itemCount);
 
         itemCountSpan.classList.remove('hide');
         itemCountSpan.textContent = itemCount;
 
         btn.innerHTML = 'Added to Cart';
+
+        if (itemCount >= 4) {
+          cartFooterElement.classList.remove('sticky');
+        } else {
+          cartFooterElement.classList.add('sticky');
+        }
 
       } catch (error) {
         console.error('Error during fetch:', error);
