@@ -178,6 +178,7 @@ This file can be re-written at any time.
         };
 
         window.shopUrl = '{%- if routes.root_url == "/" -%}{%- else -%}{{ routes.root_url }}{%- endif -%}';
+        window.collectionHandle = '{{ collection.handle }}';
 
         var set_day = '{{ "general.countdown.day" | t | strip_newlines }}',
             set_hour = '{{ "general.countdown.hour" | t | strip_newlines }}',
