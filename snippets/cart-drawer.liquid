@@ -274,6 +274,12 @@
     }    
   });
 
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+      document.getElementById('cart-drawer').classList.add('transition');
+    }, 1000);
+  });
+
 </script>
 
 <!-- CSS for styling the cart drawer -->
@@ -298,9 +304,17 @@
       background-color: white;
       box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
       transform: translateX(100%);
-      transition: transform 0.3s ease-in-out;
+      
       z-index: 10;
       overflow-y: scroll;
+  }
+
+  .cart-drawer.transition {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .cart-drawer.open {
+      transform: translateX(0);
   }
 
   .cart-drawer::-webkit-scrollbar {
@@ -313,10 +327,6 @@
 
   .cart-drawer.is-empty .cart-items {
     display: none;
-  }
-  
-  .cart-drawer.open {
-      transform: translateX(0);
   }
 
   .cart-drawer .main-cart-drawer {
