@@ -138,9 +138,11 @@
       const cartItem = document.querySelector(`.cart-item`);
       const cartUrl = '/cart/add.json';
 
+      const minQuantity = 24;
+
       const payload = {
         id: variantId,
-        quantity: quantity
+        quantity: minQuantity
       };
 
       const headers = {
@@ -166,21 +168,15 @@
         }
 
         const addedItem = await response.json();
-        // console.log('Item added to cart:', addedItem);
 
         const cartResponse = await fetch('/cart.js');
         MainCartWrap.style.opacity = '1';
-        
-        // Add console log to check cart response
-        // console.log('Cart response:', cartResponse);
-
+    
         if (!cartResponse.ok) {
           throw new Error(`HTTP error! Status: ${cartResponse.status}`);
         }
 
         const cartData = await cartResponse.json();
-        // console.log('Updated cart information:', cartData);
-
         const itemCount = cartData.item_count;
 
         itemCountSpan.classList.remove('hide');
