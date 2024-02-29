@@ -146,7 +146,7 @@
                     <button class="down" aria-label="decrease" data-item-id="${item.id}">
                       <svg width="10" viewBox="0 0 12 2" xmlns="http://www.w3.org/2000/svg"><path d="M11.25 0H.75C.3 0 0 .4 0 1s.3 1 .75 1h10.5c.45 0 .75-.4.75-1s-.3-1-.75-1z" fill="#7A7A7A" fill-rule="nonzero"></path></svg>
                     </button>
-                      <input type="text" id="quantity-${item.id}" value="${item.quantity}">
+                      <input type="text" id="quantity-${item.id}" data-item-id="${item.id}" value="${item.quantity}">
                       <button class="up" aria-label="increase" data-item-id="${item.id}">
                         <svg width="10" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M11 5H7V1a1 1 0 00-2 0v4H1a1 1 0 000 2h4v4a1 1 0 002 0V7h4a1 1 0 000-2z" fill="currentColor" fill-rule="nonzero"></path></svg>
                       </button>
@@ -332,7 +332,7 @@
           checkoutBtn.setAttribute('style', 'pointer-events:none;cursor:not-allowed;opacity:0.5');
       } else if (existingSpanElement && data.item_count >= 96) {
           existingSpanElement.remove();
-          checkoutBtn.setAttribute('style', '')
+          checkoutBtn.setAttribute('style', '');
       }
     }
 
@@ -385,23 +385,18 @@
     fetchCartData(); // fetch data on page load 
   });
 
-  document.addEventListener('input', function(event) {
+  document.addEventListener('change', function(event) {
     const targetInput = event.target.closest("input");
-     if (!targetInput) return; 
+    let newQuantity = parseInt(targetInput.value);
+
+    if (!targetInput) return; 
     
     const itemId = targetInput.dataset.itemId;
     if (!itemId) return;
-    
-    if (targetButton.classList.contains("up")) {
-        increaseQuantity(itemId);
-    } else if (targetButton.classList.contains("down")) {
-        decreaseQuantity(itemId);
-    } else if (targetButton.classList.contains("item-remove")) {
-        removeItem(itemId);
-    } 
-
-    console.log(targetInput.value);
-    
+    updateQuantity(itemId, newQuantity);
+    if (newQuantity == 0) {
+      removeItem(itemId);
+    }
   });
 
 </script>
