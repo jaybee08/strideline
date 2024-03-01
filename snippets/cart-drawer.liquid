@@ -135,12 +135,7 @@
     border: 1px solid rgba(0,0,0,0.1);
     background-color: #ffffff;
   }
-
-  .cart-items .cart-item .cart-flex .quantity-selector button.down {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
-  
+ 
   .cart-footer {
     background-color: #f2f2f2;
     padding: 15px 0;
@@ -453,9 +448,8 @@
       let newQuantity = parseInt(quantityInput.value) - 1;
       newQuantity = Math.max(newQuantity, 0); // Ensure quantity doesn't go below 0
 
-      if (newQuantity === 0) {
-          // If the quantity becomes 0, remove the item from the cart
-          removeItem(itemId);
+      if (newQuantity < 24) {
+          alert('The quantity is below 24. The cart will not update.');
       } else {
           quantityInput.value = newQuantity; 
           updateQuantity(itemId, newQuantity);
