@@ -407,7 +407,7 @@
                 `;
                 cartItemsContainer.appendChild(itemElement);
 
-                // update cart item price
+                // update cart item subtotal on page reload
                 const cartItemInput = document.querySelector('.quantity-selector');
                 const inputElement = cartItemInput.querySelector('input');
                 const inputValue = inputElement.value;
@@ -415,13 +415,16 @@
                 const quantity = inputValue;
                 const totalPrice = (item.price * item.quantity) / 100;
                 const cartItemElement = document.querySelector(`.cart-item[data-cart-item="${item.id}"] .item-subtotal`);
-                cartItemElement.innerHTML = `$${totalPrice}`;
-                cartItemElement.classList.add(`cart-item-${index + 1}`)
+                const options = { style: 'currency', currency: 'USD' };
+                const formattedNumber = totalPrice.toLocaleString('en-US', options);  
+                cartItemElement.innerHTML = `${formattedNumber}`;
 
             });
 
             // Update total
-            cartTotalElement.textContent = `$${(cartTotal / 100).toFixed(2)}`;
+            const options = { style: 'currency', currency: 'USD' };
+            const formattedNumber = cartTotal.toLocaleString('en-US', options);
+            cartTotalElement.textContent = `${formattedNumber}`;
 
             if (cartItems.lenght == 0) {
               cartItemsContainer.remove();
