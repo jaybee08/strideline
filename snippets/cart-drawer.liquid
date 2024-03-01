@@ -117,6 +117,7 @@
             const cartItems = data.items;
             const cartTotal = data.total_price;
             const cartItemsContainer = document.getElementById("cart-items");
+            const cartItemContainer = document.getElementById("cart-item");
             const cartTotalElement = document.getElementById("cart-total");
             const cartCountElement = document.querySelector(".cart-count");
 
@@ -151,10 +152,24 @@
                         <svg width="10" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M11 5H7V1a1 1 0 00-2 0v4H1a1 1 0 000 2h4v4a1 1 0 002 0V7h4a1 1 0 000-2z" fill="currentColor" fill-rule="nonzero"></path></svg>
                       </button>
                   </div>
-                    <span class="price" data-item-id="${item.id}">$${(itemPrice / 100).toFixed(2)}</span>
+                    <span class="price">$${(itemPrice / 100).toFixed(2)}</span>
+                    <span class="item-subtotal price" data-item-id="${item.id}" style="font-weight:300">
+                      $${(itemPrice / 100).toFixed(2)}
+                    </span>
                 </div>
                 `;
                 cartItemsContainer.appendChild(itemElement);
+
+                // update cart item price
+                const cartItemInput = document.querySelector('.quantity-selector');
+                const inputElement = cartItemInput.querySelector('input');
+                const inputValue = inputElement.value;
+       
+                const quantity = inputValue;
+                const totalPrice = (item.price * quantity) / 100;
+
+                const cartItemElement = document.querySelector(`.cart-item[data-cart-item="${item.id}"] .item-subtotal`);
+                cartItemElement.innerHTML = `$${totalPrice}`;
 
             });
 
@@ -167,6 +182,7 @@
             
             openCartDrawer(); // Open the cart drawer
             minQuantity(data);
+            
         })
         .catch(error => console.error('Error fetching cart data:', error));
   }
@@ -227,19 +243,20 @@
             cartTotalElement.textContent = `$${(cartTotal / 100).toFixed(2)}`;
             const itemElement = document.querySelector(`.cart-item[data-cart-item="${itemId}"]`);
             console.log('cart icon count:', data.item_count);
+
             if (itemElement) {
               // itemElement.querySelector(".price").textContent = `$${(updatedPrice / 100).toFixed(2)}`;
               const quantity = parseInt(document.querySelector(`#quantity-${itemId}`).value);
               const totalPrice = (updatedPrice * quantity) / 100; // Calculate the total price
 
-              itemElement.querySelector(`.price[data-item-id="${itemId}"]`).textContent = `$${totalPrice.toFixed(2)}`; // Update the displayed price
+              itemElement.querySelector(`.item-subtotal[data-item-id="${itemId}"]`).textContent = `$${totalPrice.toFixed(2)}`; // Update the displayed price
 
               MenuCartIcon.textContent = data.item_count;
             }
 
             loaderElement.style.display = 'none'; 
 
-              minQuantity(data);
+            minQuantity(data);
 
         }
     })
@@ -353,6 +370,7 @@
               console.log('show empty message');
             }
             minQuantity(data);
+
         })
         .catch(error => console.error('Error updating cart count:', error));
   }
@@ -377,12 +395,12 @@
     }    
   });
 
-  // Prevent slidecart from flickering on page load
+  // Prevent cartdrawer from flickering on page load
   document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
       document.getElementById('cart-drawer').classList.add('transition');
     }, 1000);
-    fetchCartData(); // fetch data on page load 
+    fetchCartData(); // fetch data on page load
   });
 
   document.addEventListener('change', function(event) {
