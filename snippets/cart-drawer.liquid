@@ -664,12 +664,9 @@
     const itemId = targetInput.dataset.itemId;
     if (!itemId) return;
     if(newQuantity < 24) {
-      alert('Quantity is below 24!');
+      alert('The quantity is below 24. The cart will not update.');
     } else {
       updateQuantity(itemId, newQuantity);
-    }
-    if (newQuantity == 0) {
-      removeItem(itemId);
     }
   });
 
