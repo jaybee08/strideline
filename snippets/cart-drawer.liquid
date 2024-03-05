@@ -660,7 +660,7 @@
     const itemId = targetInput.dataset.itemId;
     if (!itemId) return;
     if(newQuantity < 24) {
-      alert('The quantity is below 24. The cart will not update.');
+      alert('The minimum order quantity for an item is 24.');
     } else {
       updateQuantity(itemId, newQuantity);
     }
