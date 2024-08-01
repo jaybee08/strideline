@@ -1,3 +1,12 @@
+/*
+* ------------------------------------------------------------
+* IMPORTANT: The contents of this file are auto-generated.
+*
+* This file may be updated by the Shopify admin theme editor
+* or related systems. Please exercise caution as any changes
+* made to this file may be overwritten.
+* ------------------------------------------------------------
+*/
 {
   "current": {
     "license": "",
@@ -18,7 +27,7 @@
     "big_pr_roundness": 6,
     "terms_cond_checkbox_show": true,
     "terms_cond_checkbox_text": "I agree with the terms and conditions.",
-    "ajax_addtocart": false,
+    "ajax_addtocart": true,
     "show_wishlist": false,
     "show_compare": false,
     "buy_in_one_click": false,
