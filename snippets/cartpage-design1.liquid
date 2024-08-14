@@ -173,8 +173,11 @@
               </div>
               {% endif %}
               {% for item in cart.items %}
-
+                {% if item.quantity < 24 %}
+                  <span>Each product has a 24 item minimum</span>
+                {% endif %}
               {% endfor %}
+              {{ cart.item_count }}
               <button type="submit" class="btn btn-lg" name="checkout"{% if settings.terms_cond_checkbox_show %} disabled{% endif %}><span class="icon icon-check_circle"></span>{{ 'cart.general.checkout' | t }}</button>
             </div>
           </div>
