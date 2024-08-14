@@ -172,6 +172,9 @@
                 </label>
               </div>
               {% endif %}
+              {% for item in cart.items %}
+
+              {% endfor %}
               <button type="submit" class="btn btn-lg" name="checkout"{% if settings.terms_cond_checkbox_show %} disabled{% endif %}><span class="icon icon-check_circle"></span>{{ 'cart.general.checkout' | t }}</button>
             </div>
           </div>
