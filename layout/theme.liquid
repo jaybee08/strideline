@@ -1,8 +1,8 @@
-{% include 'shogun-content-handler' %}
-{%- comment %}<locksmith:243d>{% endcomment -%}
+{%- comment %}<locksmith:c352>{% endcomment -%}
   {%- include 'locksmith' -%}
-{%- comment %}</locksmith:243d>{% endcomment -%}
+{%- comment %}</locksmith:c352>{% endcomment -%}
 
+{% include 'shogun-content-handler' %}
 <!doctype html>
 <!--[if IE 9]>
   <html class="ie9 no-js{% if settings.use_rtl %} rtlstyle{% endif %}" lang="{{ request.locale.iso_code }}">
@@ -51,10 +51,10 @@
     <title>{{ seo_title }}</title>
 
     {%- if page_description -%}
-      {%- comment %}<locksmith:454e>{% endcomment -%}
+      {%- comment %}<locksmith:df95>{% endcomment -%}
         {%- capture var %}{% render 'locksmith-variables', variable: 'transparent', hiding_scope: 'resource' %}{% endcapture %}{% if var == 'true' %}<meta name="description" content="{{ page_description | escape }}">{% endif -%}
         {%- comment %}original: <meta name="description" content="{{ page_description | escape }}">{%- endcomment %}
-      {%- comment %}</locksmith:454e>{% endcomment -%}
+      {%- comment %}</locksmith:df95>{% endcomment -%}
     {%- endif -%}
 
     {%- if settings.use_countdown_timezone -%}
